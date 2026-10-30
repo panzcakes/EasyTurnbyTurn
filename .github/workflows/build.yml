@@ -45,11 +45,17 @@ jobs:
       - name: Build debug APK
         run: gradle --no-daemon assembleDebug
 
+      - name: Name the APK
+        run: |
+          VERSION=$(grep -oP 'versionName = "\K[^"]+' app/build.gradle.kts)
+          cp app/build/outputs/apk/debug/app-debug.apk "EasyTurnByTurn-v$VERSION.apk"
+          echo "APK=EasyTurnByTurn-v$VERSION.apk" >> "$GITHUB_ENV"
+
       - name: Keep the APK as a build artifact
         uses: actions/upload-artifact@v4
         with:
           name: EasyTurnByTurn-apk
-          path: app/build/outputs/apk/debug/app-debug.apk
+          path: ${{ env.APK }}
 
       # Also attach it to a "latest" release so it can be downloaded directly on a phone.
       - name: Publish to the 'latest' release
@@ -60,5 +66,4 @@ jobs:
           name: Latest build
           prerelease: true
           body_path: RELEASE_NOTES.md
-          files: app/build/outputs/apk/debug/app-debug.apk
-
+          files: ${{ env.APK }}
