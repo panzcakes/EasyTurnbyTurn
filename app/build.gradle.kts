@@ -11,8 +11,8 @@ android {
         applicationId = "app.clusternav.test"
         minSdk = 26
         targetSdk = 34
-        versionCode = 13
-        versionName = "1.0"
+        versionCode = 15
+        versionName = "1.2"
     }
 
     // Signing: the GitHub build passes a key through environment variables (see README). Without

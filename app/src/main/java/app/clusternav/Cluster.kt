@@ -14,7 +14,7 @@ import java.util.Locale
  * screen can come and go without dropping the connection.
  */
 object Cluster {
-    const val VERSION = "1.0"
+    const val VERSION = "1.2"
     private const val MAX_LOG_LINES = 1500
 
     private val main = Handler(Looper.getMainLooper())

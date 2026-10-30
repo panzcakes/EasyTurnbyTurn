@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- azure ring -->
+    <path
+        android:pathData="M54,22 a32,32 0 1,0 0,64 a32,32 0 1,0 0,-64"
+        android:strokeColor="#2F9BFF"
+        android:strokeWidth="4" />
+    <group android:translateX="-3" android:translateY="-2.5">
+        <!-- turn arrow: up, then right -->
+        <path
+            android:pathData="M41,74 L41,51 L62,51"
+            android:strokeColor="#FFFFFF"
+            android:strokeWidth="10"
+            android:strokeLineJoin="miter" />
+        <path
+            android:fillColor="#FFFFFF"
+            android:pathData="M62,37 L80,51 L62,65 Z" />
+    </group>
+</vector>

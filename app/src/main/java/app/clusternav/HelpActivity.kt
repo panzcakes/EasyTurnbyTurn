@@ -30,16 +30,24 @@ class HelpActivity : Activity() {
             "You can lock the phone or close this screen. To stop, tap Turn relay off, or Stop in the notification.",
 
         "What the bike shows" to
-            "The straight arrow with the distance counts down until the turn is closer than the distance set in " +
-            "Settings (1 km by default). Then the turn arrow appears. Roundabouts show the roundabout symbol and " +
-            "exit number (1 to 4). When you arrive, the finish flag appears.",
+            "The next turn and its distance are shown as soon as Google Maps reports them, so you only need to look " +
+            "when the turn is close. Under 200 m the turn icon flashes. Roundabouts show the roundabout symbol and " +
+            "exit number (1 to 4). When you arrive, the finish flag appears.\n\n" +
+            "At the very start Google Maps says only \"Head ...\", so the bike shows a straight arrow until Maps reports " +
+            "the first turn. You can change this in Settings (show the turn arrow only within a set distance, or turn " +
+            "off the flashing).",
 
         "Troubleshooting" to
             "Waiting for the bike: switch the bike on. It connects by itself. If it never does, force stop the official " +
             "Hero app, switch Bluetooth off and on, and try again.\n\n" +
             "The bike says \"start navigation from phone\": the bike lost the data. Turn the relay off and on, or restart " +
             "the route in Google Maps.\n\n" +
+            "\"Restricted setting\" when turning on notification access: on Android 13 and newer, open Settings > Apps > " +
+            "Easy Turn by Turn, tap the three dots at the top right, tap Allow restricted settings, then try again.\n\n" +
             "Nothing happens when navigating: check Notification access in Settings. Google Maps must be set to English.\n\n" +
+            "Battery: if the bike is not connected for 5 minutes (change it in Settings), the app closes its background " +
+            "service and notification. It starts again by itself when Google Maps navigation begins. If it happens during " +
+            "navigation, the relay turns off: switch it on again when the bike is ready.\n\n" +
             "It stops working after a while: set Battery to Unrestricted, allow auto-start if your phone has that option, and " +
             "lock the app in the recent apps list.\n\n" +
             "A wrong arrow: use Settings > Arrow picture mapping to pick the cluster letter for that Google Maps arrow.\n\n" +

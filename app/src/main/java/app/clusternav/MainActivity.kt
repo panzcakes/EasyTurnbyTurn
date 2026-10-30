@@ -230,7 +230,7 @@ class MainActivity : Activity() {
         }
         col.addView(relaySwitch)
         col.addView(CheckBox(this).apply {
-            text = "Lowercase letters for turns under 200 m (experimental, off = safest)"
+            text = "Flash the turn icon under 200 m (lowercase letters)"
             isChecked = Relay.lowercaseNear
             setOnCheckedChangeListener { _, on -> if (!building) Relay.lowercaseNear = on }
         })

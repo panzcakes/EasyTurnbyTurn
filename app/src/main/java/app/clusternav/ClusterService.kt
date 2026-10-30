@@ -7,7 +7,10 @@ import android.app.PendingIntent
 import android.app.Service
 import android.content.Intent
 import android.graphics.drawable.Icon
+import android.os.Handler
 import android.os.IBinder
+import android.os.Looper
+import android.os.SystemClock
 
 /**
  * Keeps the process alive in the background (foreground service with a notification) so the
@@ -20,6 +23,32 @@ class ClusterService : Service() {
         const val ACTION_STOP = "app.clusternav.STOP"
         private const val CHANNEL_ID = "cluster_link"
         private const val NOTIFICATION_ID = 1
+    }
+
+    private val handler = Handler(Looper.getMainLooper())
+    private var notReadySince = 0L
+
+    /** Stops the service (and its notification) if the bike has not been connected for too long. */
+    private val idleCheck = object : Runnable {
+        override fun run() {
+            Relay.init(this@ClusterService)
+            val limit = Relay.idleStopMinutes
+            if (limit > 0) {
+                val now = SystemClock.elapsedRealtime()
+                if (Cluster.state == ClusterLink.State.READY) {
+                    notReadySince = now
+                } else if (now - notReadySince >= limit * 60_000L) {
+                    Cluster.log("Bike not connected for $limit minutes - stopping to save battery")
+                    // During a trip the relay would just restart the service, so switch it off too.
+                    if (Relay.tripActive) Relay.enabled = false
+                    Cluster.disconnect()
+                    stopForeground(STOP_FOREGROUND_REMOVE)
+                    stopSelf()
+                    return
+                }
+            }
+            handler.postDelayed(this, 15_000L)
+        }
     }
 
     override fun onBind(intent: Intent?): IBinder? = null
@@ -35,10 +64,14 @@ class ClusterService : Service() {
         }
         createChannel()
         startForeground(NOTIFICATION_ID, buildNotification())
+        notReadySince = SystemClock.elapsedRealtime()
+        handler.removeCallbacks(idleCheck)
+        handler.postDelayed(idleCheck, 15_000L)
         return START_NOT_STICKY
     }
 
     override fun onDestroy() {
+        handler.removeCallbacks(idleCheck)
         // If the system or the user stops the service, drop the link too.
         Cluster.disconnect()
         super.onDestroy()

@@ -88,8 +88,8 @@ object Relay {
     /** Lowercase letters for turns under 200 m, like the official app. Off: the cluster was only
      *  ever tested with uppercase letters, and lowercase ones may show "start navigation". */
     var lowercaseNear: Boolean
-        get() = prefs?.getBoolean("lowerNear", false) ?: false
-        set(v) { prefs?.edit()?.putBoolean("lowerNear", v)?.apply() }
+        get() = prefs?.getBoolean("lowerNear2", true) ?: true
+        set(v) { prefs?.edit()?.putBoolean("lowerNear2", v)?.apply() }
 
     /** Road names are off by default: the cluster does not show them, and a name it dislikes
      *  (v0.5: one containing "/") made it fall back to "start navigation" for the rest of the trip. */
@@ -100,8 +100,8 @@ object Relay {
     /** Show the real turn arrow only when the turn is closer than this (metres); farther away the
      *  straight arrow is shown. 0 = always show the turn arrow. */
     var arrowDistance: Int
-        get() = prefs?.getInt("arrowDist2", 1000) ?: 1000
-        set(v) { prefs?.edit()?.putInt("arrowDist2", v.coerceIn(0, 5000))?.apply() }
+        get() = prefs?.getInt("arrowDist3", 0) ?: 0
+        set(v) { prefs?.edit()?.putInt("arrowDist3", v.coerceIn(0, 5000))?.apply() }
 
     /** Real distance on the straight arrow instead of "0". Untested on the bike: turn off if the
      *  cluster falls back to "start navigation" on straight roads. */
@@ -113,6 +113,11 @@ object Relay {
     var roundaboutSwap: Boolean
         get() = prefs?.getBoolean("roundSwap", false) ?: false
         set(v) { prefs?.edit()?.putBoolean("roundSwap", v)?.apply() }
+
+    /** Stop the background service (and its notification) after this many minutes without the bike. 0 = never. */
+    var idleStopMinutes: Int
+        get() = prefs?.getInt("idleStop", 5) ?: 5
+        set(v) { prefs?.edit()?.putInt("idleStop", v.coerceIn(0, 240))?.apply() }
 
     var gpsLost: Boolean
         get() = prefs?.getBoolean("gpsLost", false) ?: false
@@ -315,7 +320,11 @@ object Relay {
 
         val letter = forced ?: (if (kind == Maneuver.STRAIGHT || kind == Maneuver.ROUNDABOUT) null else iconLetter(currentIcon)) ?: letterFor(kind)
         lastLetter = letter
-        val turn = if (lowercaseNear) NavFormat.turnLetter(letter, p.distanceM) else letter.uppercaseChar()
+        // A lowercase letter under 200 m makes the cluster flash the icon, like the official app does.
+        // Only real turn arrows flash; straight, finish and the like stay uppercase.
+        val flashes = lowercaseNear && forced == null && letter.uppercaseChar() !in "GHBTY" &&
+            kind != Maneuver.STRAIGHT && kind != Maneuver.ARRIVE && kind != Maneuver.UNKNOWN
+        val turn = if (flashes) NavFormat.turnLetter(letter, p.distanceM) else letter.uppercaseChar()
         val zero = turn == 'H' || (turn == 'G' && !straightDistance)
         val packet = NavPacket(
             turn = turn,

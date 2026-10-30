@@ -45,9 +45,13 @@ class SettingsActivity : Activity() {
         })
 
         section("Navigation")
-        row("Show turn arrow within", "The cluster shows straight until then", arrowText()) { askArrowDistance() }
+        row("Show turn arrow within", "Always = the next turn is shown from the start", arrowText()) { askArrowDistance() }
+        toggle("Flash the turn icon under 200 m", "Like the official app. Turn off if icons go missing", Relay.lowercaseNear) { Relay.lowercaseNear = it }
         toggle("Distance on straight arrow", "Off shows 0 m on straight roads", Relay.straightDistance) { Relay.straightDistance = it }
         toggle("Other roundabout symbol", "Swap if the circling direction looks wrong", Relay.roundaboutSwap) { Relay.roundaboutSwap = it }
+
+        section("Battery")
+        row("Stop if the bike is not connected for", "Closes the background service and its notification", idleText()) { askIdleStop() }
 
         section("Bike")
         row("Cluster device", Ui.deviceName(this) ?: "Not chosen", "›") { Ui.chooseDevice(this) { build() } }
@@ -69,6 +73,25 @@ class SettingsActivity : Activity() {
     private fun arrowText(): String {
         val d = Relay.arrowDistance
         return when { d == 0 -> "Always"; d >= 1000 && d % 1000 == 0 -> "${d / 1000} km"; else -> "$d m" }
+    }
+
+    private fun idleText(): String = Relay.idleStopMinutes.let { if (it == 0) "Never" else "$it min" }
+
+    private fun askIdleStop() {
+        val edit = EditText(this).apply {
+            inputType = InputType.TYPE_CLASS_NUMBER
+            setText(Relay.idleStopMinutes.toString())
+            setSelection(text.length)
+        }
+        Ui.dialog(this).setTitle("Minutes without the bike")
+            .setMessage("If the bike is not connected for this long, the app stops its background service and notification to save battery. It starts again when Google Maps navigation begins. If this happens during navigation, the relay turns off. 0 = never.")
+            .setView(edit)
+            .setPositiveButton("Save") { _, _ ->
+                Relay.idleStopMinutes = edit.text.toString().toIntOrNull() ?: 5
+                build()
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
     }
 
     private fun section(text: String) {

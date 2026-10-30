@@ -20,8 +20,8 @@ disconnects when the trip ends.
 
 ## What it does
 
-* Shows the straight arrow with a counting-down distance, and the turn arrow once the turn is close
-  (1 km by default, adjustable).
+* Shows the next turn and its distance as soon as Google Maps reports it, and flashes the icon under 200 m.
+  (Settings can instead show a straight arrow until the turn is within a set distance, or stop the flashing.)
 * Turn, slight, sharp, U-turn, keep left/right, exit, roundabout (with exit number 1-4), arrival flag, rerouting.
 * Starts and stops with your Google Maps navigation; no tapping on the bike.
 * Dark, simple home screen: one round status view and one button.
@@ -30,7 +30,7 @@ Works with English Google Maps and the Hero Xpulse 210 only. Tested on one bike 
 
 ## Install
 
-1. Download the latest `app-debug.apk` from **Releases** (the "Latest build" entry). The release text comes from `RELEASE_NOTES.md`; edit that file to change it.
+1. Download the latest APK (`EasyTurnByTurn-v1.2.apk`) from **Releases** (the "Latest build" entry). The release text comes from `RELEASE_NOTES.md`; edit that file to change it.
 2. Open it on your phone and allow installing from your browser or file manager.
 3. **Google Play Protect warning.** The app is not in the Play Store, so Play Protect may show *"Unknown
    developer"*, *"App not scanned"* or *"Blocked by Play Protect"*. That means Google does not know the app,
@@ -46,6 +46,10 @@ Works with English Google Maps and the Hero Xpulse 210 only. Tested on one bike 
 2. Fully close the official Hero app (Force stop); the cluster talks to one phone at a time.
 3. Open the app and follow the hints above the button: allow Bluetooth and notifications, choose the bike,
    allow notification access, set Battery to **Unrestricted**.
+   - **"Restricted setting" message?** On Android 13 and newer, apps installed outside the Play Store cannot
+     get notification access until you allow it once: open **Settings > Apps > Easy Turn by Turn**, tap the
+     three dots at the top right, tap **Allow restricted settings**, then go back and turn notification access
+     on. This is an Android security feature and cannot be skipped by the app.
 4. Tap **Turn relay on**.
 5. Tap the circle to open Google Maps and start a route. The bike connects by itself.
 
@@ -57,7 +61,9 @@ The menu at the top right has **Settings**, **Help** and **Developer tools** (le
 |---|---|
 | Stays on "Waiting for the bike" | Switch the bike on; force stop the official Hero app; switch Bluetooth off and on |
 | Bike shows "start navigation from phone" | Turn the relay off and on, or restart the route |
+| Notification access is greyed out or says "Restricted setting" | Settings > Apps > Easy Turn by Turn > three dots > Allow restricted settings |
 | Nothing happens during navigation | Check notification access; Google Maps must be in English |
+| Notification disappeared | The bike was not connected for 5 minutes (adjustable in Settings), so the app stopped to save battery. It starts again when Google Maps navigation begins; if it happened during navigation, switch the relay on again |
 | Stops after a while | Battery > Unrestricted, allow auto-start, lock the app in recent apps |
 | A wrong arrow | Settings > Arrow picture mapping |
 
@@ -68,26 +74,6 @@ A log can contain the bike's Bluetooth address and place names from your route; 
 
 No internet permission; nothing is sent anywhere. The app reads only the Google Maps navigation
 notification, to show it on the bike. Logs stay on the phone unless you copy or share them.
-
-## Build it yourself
-
-The APK is built by GitHub Actions (`.github/workflows/build.yml`) on every push, and attached to the
-**Latest build** release. To build locally: Android SDK, JDK 17 and Gradle 8.7, then `gradle assembleDebug`.
-
-### Fixed signing key (optional, recommended)
-
-Without a key the build uses a throwaway debug key, and each new build may refuse to install over the last.
-To keep one key, create it once and add four repository secrets
-(Settings > Secrets and variables > Actions):
-
-`KEYSTORE_BASE64` (the keystore file, base64 on one line), `KEYSTORE_PASSWORD`, `KEY_ALIAS`, `KEY_PASSWORD`.
-
-```
-keytool -genkeypair -keystore easyturn.jks -alias easyturn -keyalg RSA -keysize 2048 -validity 36500
-base64 -w0 easyturn.jks
-```
-
-**Never commit the keystore or its passwords.** Anyone with them can publish updates that install over your app.
 
 ## Protocol
 
